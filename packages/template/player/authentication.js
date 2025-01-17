@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
+const { showOnlineTime } = require('./utils');
 
 const saltRounds = 10;
 
@@ -34,6 +35,7 @@ mp.events.add('server:loginAccount', async (player, username, password) => {
     try {
         //  Returns true/false if the login was successful or not
         const res = await attemptLogin(username, password);
+        console.log(res);
         res ? successLoginHandle(player, 'success', username) : failedLoginHandle(player, 'incorrectinfo');
     } catch(e) { errorHandler(e) };
 });
@@ -52,6 +54,11 @@ mp.events.add('server:loadAccount', async (player, username) => {
             rows[0][0].position === null
                 ? player.position = new mp.Vector3(mp.settings.defaultSpawnPosition)
                 : player.position = new mp.Vector3(JSON.parse(rows[0][0].position));
+
+            const onlineTime = rows[0][0].onlineTime;
+
+            player.setVariable("onlineTime", onlineTime);
+            player.setVariable("onlineTimeStart", Date.now());
             player.setVariable("loggedIn", true);
         }
     } catch(e) { errorHandler(e) };
@@ -65,10 +72,20 @@ mp.events.add('playerJoin', (player) => {
 //  Saves the account data upon player quitting (only logged in users)
 mp.events.add('playerQuit', async (player) => {
     if(player.getVariable('loggedIn') === false) return;
+
+    const onlineTimeOld = player.getVariable('onlineTime');
+    const onlineTimeCurrent = playerOnlineTime();
+
+    const onlineTime = onlineTimeOld + onlineTimeCurrent;
+
     let name = player.name;
     try {
-        const [status] = await mp.db.query('UPDATE `users` SET `position` = ? WHERE username = ?', [JSON.stringify(player.position), player.name]);
-        if(status.affectedRows === 1) console.log(`${name}'s data successfully saved.`);
+        const [status] = await mp.db.query('UPDATE `users` SET `position` = ?, `onlineTime` = ? WHERE username = ?', [JSON.stringify(player.position), onlineTime, player.name]);
+        if(status.affectedRows === 1) {
+            console.log(`${name}'s data successfully saved.`);
+
+            showOnlineTime(onlineTime);
+        }
         console.log(`${name} has quit the server.`);
     } catch(e) { errorHandler(e) }
 })
@@ -83,7 +100,7 @@ async function attemptRegister(player, username, email, pass){
 
         const hash = await bcrypt.hash(pass, saltRounds);
         
-        const result = await mp.db.query('INSERT INTO `users` SET `uuid` = ?, `username` = ?, `email` = ?, `password` = ?, `socialClub` = ?, `socialClubId` = ?', 
+        const result = await mp.db.query('INSERT INTO `users` SET `uuid` = ?, `username` = ?, `email` = ?, `password` = ?, `socialClub` = ?, `socialClubId` = ?, `levelVip` = 0, `onlineTime` = 0', 
             [uuidv4(), username, email, hash, player.socialClub, player.rgscId]);
 
         //  An affected row means a row has been successfully inserted into the table

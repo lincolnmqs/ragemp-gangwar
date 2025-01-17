@@ -14,7 +14,7 @@ if (!fs.existsSync(__dirname + '/settings.json')) {
 //  Step 3 - Load up gamemode assets
 mp.db = require('mysql2/promise').createPool({host: mp.settings.db_host, user: mp.settings.db_username, password: mp.settings.db_password, database: mp.settings.db_name, connectionLimit: mp.settings.db_connectionLimit, multipleStatements: true});
 mp.test = require('./test.js');
-require('./authentication.js');
+require('./player/authentication.js');
 const database = require('./database.js');
 
 //  Step 4 - Wait for everything to load, then allow connections once all is loaded
