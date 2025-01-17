@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
-const { showOnlineTime } = require('./utils');
+const { onlineTimeDiff } = require('./utils');
 
 const saltRounds = 10;
 
@@ -74,7 +74,7 @@ mp.events.add('playerQuit', async (player) => {
     if(player.getVariable('loggedIn') === false) return;
 
     const onlineTimeOld = player.getVariable('onlineTime');
-    const onlineTimeCurrent = playerOnlineTime();
+    const onlineTimeCurrent = onlineTimeDiff();
 
     const onlineTime = onlineTimeOld + onlineTimeCurrent;
 

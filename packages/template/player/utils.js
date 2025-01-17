@@ -1,13 +1,11 @@
-export const onlineTime = (player) => {
-    const onlineTimeStart = player.getVariable("onlineTimeStart");
-    const onlineTimeEnd   = Date.now();
+const moment = require('moment');
+
+export const onlineTimeDiff = (player) => {
+    const startTime = player.getVariable("onlineTimeStart");
+    const endTime   = Date.now();
 
     const timeDiff = endTime - startTime;
-
-    // Converta o tempo usando Moment.js
-    const moment = require('moment'); // Certifique-se de ter instalado o moment
     
-    // Crie uma duração usando a diferença
     const duration = moment.duration(timeDiff);
 
     const showTime = showOnlineTime(duration);
@@ -20,7 +18,6 @@ export const onlineTime = (player) => {
 export const showOnlineTime = (totalTime) => {
     const duration = moment.duration(totalTime);
 
-    // Extrai os valores formatados
     const years = duration.years();
     const months = duration.months();
     const days = duration.days();
