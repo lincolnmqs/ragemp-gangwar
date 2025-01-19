@@ -1,8 +1,9 @@
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
-const { onlineTimeDiff } = require('./utils');
+const moment = require('moment');
 
 const saltRounds = 10;
+const player = {};
 
 //  Called when a player submits the Registration HTML form
 mp.events.add('server:registerAccount', async (player, username, email, password) => {
@@ -35,7 +36,6 @@ mp.events.add('server:loginAccount', async (player, username, password) => {
     try {
         //  Returns true/false if the login was successful or not
         const res = await attemptLogin(username, password);
-        console.log(res);
         res ? successLoginHandle(player, 'success', username) : failedLoginHandle(player, 'incorrectinfo');
     } catch(e) { errorHandler(e) };
 });
@@ -43,9 +43,18 @@ mp.events.add('server:loginAccount', async (player, username, password) => {
 //  Called after successfully logging into an account and loads the data onto the account
 mp.events.add('server:loadAccount', async (player, username) => {
     try {
-        const [rows] = await mp.db.query('SELECT * FROM `users` WHERE `username` = ?; UPDATE `users` SET `lastActive` = now() WHERE username = ?', 
-            [username, username]
-        );
+        const [rows] = await mp.db.query(`
+            SELECT * 
+            FROM \`users\` 
+            INNER JOIN \`gangs\`
+            ON \`users\`.\`gangId\` = \`gangs\`.\`gangId\`
+            WHERE \`username\` = ?; 
+        
+            UPDATE \`users\` 
+            SET \`lastActive\` = now() 
+            WHERE \`username\` = ?;
+        `, [username, username]);
+        
         if(rows.length != 0){
             player.sqlID = rows[0][0].ID;
             player.name = username;
@@ -57,8 +66,12 @@ mp.events.add('server:loadAccount', async (player, username) => {
 
             const onlineTime = rows[0][0].onlineTime;
 
-            player.setVariable("onlineTime", onlineTime);
-            player.setVariable("onlineTimeStart", Date.now());
+            player[username] = {
+                onlineTime      : onlineTime,
+                onlineTimeStart : Date.now(),
+                color           : rows[0][0].color
+            };
+
             player.setVariable("loggedIn", true);
         }
     } catch(e) { errorHandler(e) };
@@ -73,14 +86,14 @@ mp.events.add('playerJoin', (player) => {
 mp.events.add('playerQuit', async (player) => {
     if(player.getVariable('loggedIn') === false) return;
 
-    const onlineTimeOld = player.getVariable('onlineTime');
-    const onlineTimeCurrent = onlineTimeDiff();
+    const onlineTimeOld = player[player.name].onlineTime;
+    const onlineTimeCurrent = onlineTimeDiff(player);
 
     const onlineTime = onlineTimeOld + onlineTimeCurrent;
 
     let name = player.name;
     try {
-        const [status] = await mp.db.query('UPDATE `users` SET `position` = ?, `onlineTime` = ? WHERE username = ?', [JSON.stringify(player.position), onlineTime, player.name]);
+        const [status] = await mp.db.query('UPDATE `users` SET `position` = ?, `onlineTime` = ? WHERE username = ?', [JSON.stringify(player.position), onlineTime, name]);
         if(status.affectedRows === 1) {
             console.log(`${name}'s data successfully saved.`);
 
@@ -115,6 +128,8 @@ async function attemptLogin(username, password){
 
         //  If no account found, return false
         if(rows.length === 0) return false;
+
+        const hash = await bcrypt.hash(password, saltRounds);
 
         //  Returns true/false if the password matches
         const res = await bcrypt.compare(password, rows[0].password);
@@ -154,7 +169,7 @@ function successLoginHandle(player, handle, username){
         player.idleKick = null;
     }
     mp.events.call("server:loadAccount", player, username);
-    player.call('client:loginHandler', [handle]);
+    player.call('client:loginHandler', [player, handle]);
     console.log(`${username} has successfully logged in.`);
 }
 
@@ -171,4 +186,30 @@ function timeoutKick(user){
 function validEmail(email) {
     let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
+}
+
+const onlineTimeDiff = (player) => {
+    const startTime = player[player.name].onlineTimeStart;
+    const endTime   = Date.now();
+
+    const timeDiff = endTime - startTime;
+    
+    const duration = moment.duration(timeDiff);
+
+    const showTime = showOnlineTime(duration);
+
+    return duration;
+}
+
+const showOnlineTime = (totalTime) => {
+    const duration = moment.duration(totalTime);
+
+    const years = duration.years();
+    const months = duration.months();
+    const days = duration.days();
+    const hours = duration.hours();
+    const minutes = duration.minutes();
+    const seconds = duration.seconds();
+
+    return `Tempo total: ${years} anos, ${months} meses, ${days} dias, ${hours} horas, ${minutes} minutos e ${seconds} segundos`;
 }

@@ -1,10 +1,10 @@
 const errorMsg = {
-	"password-mismatch": "Passwords do not match, please type them again.",
-	"logged": "That account is already logged in.",
-	"invalid-info": "The email you provided is not valid.",
-	"takeninfo": "The username or email you have provided is taken.",
-	"tooshort": "The username or password you have provided is too short",
-	"incorrectinfo": "The username or password you have entered is incorrect."
+	"password-mismatch": "As senhas não correspondem, digite-as novamente",
+	"logged": "Essa conta já está logada",
+	"invalid-info": "O e-mail que você forneceu não é válido",
+	"takeninfo": "O nome de usuário ou e-mail que você forneceu foi usado",
+	"tooshort": "O nome de usuário ou senha que você forneceu é muito curto",
+	"incorrectinfo": "O nome de usuário ou senha que você digitou está incorreto"
 }
 
 $('.alert').hide();

@@ -8,9 +8,17 @@ mp.events.add('client:registerData', (username, email, password) => {
     mp.events.callRemote("server:registerAccount", username, email, password);
 })
 
-mp.events.add('client:loginHandler', (handle) => {
+mp.events.add('client:loginHandler', (player, handle) => {
     switch(handle){
 		case 'success':
+            mp.gui.chat.push(`!{#FF0000} =================================================== `);
+            mp.gui.chat.push(`!{#00FF00} A novidade começa aqui | Global Evolution PlayBoy`);
+            mp.gui.chat.push(`!{#FFD700} Digite /comandos para ver os comandos do servidor.`);
+            mp.gui.chat.push(`!{#FFD700} Digite /regras para ver as regras do servidor.`);
+            mp.gui.chat.push(`!{#FFD700} Temos um sistema de Gang VIP, verifque-o em /vangensgvip`);
+            mp.gui.chat.push(`!{#FFD700} Temos um sistema de Player VIP, verifique-o em /vantegensvip`);
+            mp.gui.chat.push(`!{#FFD700} Seja um player correto, respeite todas as regras`);
+            mp.gui.chat.push(`!{#FF0000} =================================================== `);
 		case 'registered':
             mp.events.call('client:hideLoginScreen');
             break;
