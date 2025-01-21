@@ -30,3 +30,5 @@ const database = require('./database.js');
 
 require('./player/login.js');
 require('./player/chat.js');
+require('./vspawner');
+require('./createTerritory');

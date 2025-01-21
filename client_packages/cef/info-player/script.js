@@ -8,7 +8,7 @@ function setInfoPlayer (
     gangExpPercentage
 ) {
     $("#playerName").text(playerName);
-    $("#levelPlayer").text('Level: ' + levelPlayer);
+    $("#levelPlayer").text('LEVEL ' + levelPlayer);
     $("#boxExpPlayer").css("width", (`${playerExpPercentage}`)+"%");
 
     if (gangId == 1)
@@ -16,7 +16,7 @@ function setInfoPlayer (
 
     else if (gangId > 1) {
         $("#gangName").text(gangName);
-        $("#levelGang").text('Level: ' + levelGang);
+        $("#levelGang").text('LEVEL ' + levelGang);
         $("#boxExpGang").css("width", (`${gangExpPercentage}`)+"%");
     }
 };

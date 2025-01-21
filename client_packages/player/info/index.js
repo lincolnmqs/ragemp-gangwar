@@ -36,12 +36,12 @@ mp.events.add('client:infoPlayer', (dataPlayer) => {
   browserLifeBar.execute('setLifeArmorBar("' + player.getHealth() + '", "' + player.getArmour() + '")');
   
   //if u don't wanna use the gps off just delete this condition.
-  if (mp.players.local.vehicle) { //Check if the player is in car or not.
+  /*if (mp.players.local.vehicle) { //Check if the player is in car or not.
       mp.game.ui.displayRadar(true);
       // mp.game.graphics.notify('Gps ~g~Enabled');
   }
   else {
       mp.game.ui.displayRadar(false);
-  }
+  }*/
 });
   

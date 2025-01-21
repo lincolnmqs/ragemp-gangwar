@@ -143,8 +143,6 @@ mp.events.add('playerQuit', async (player) => {
 
             showOnlineTime(onlineTime);
         }
-        // delete local data
-        delete player[name];
         console.log(`${name} has quit the server.`);
     } catch(e) { errorHandler(e) }
 })

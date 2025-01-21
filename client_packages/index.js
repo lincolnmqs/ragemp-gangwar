@@ -1,6 +1,8 @@
 require('./player/login');
 require('./player/chat');
 require('./player/info');
+require('./vspawner');
+require('./createTerritory');
 
 mp.events.add('playerReady', () => {
     mp.events.call('client:showLoginScreen');
