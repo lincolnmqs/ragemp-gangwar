@@ -1,3 +1,16 @@
+/*const commands = {
+    '/gang': 'Comandos da gang: /gang criar | entrar | sair | kickar | level | info | membros',
+    '/gang criar': 'Digite: /gang criar [nome da gang]',
+    '/gang entrar': '',
+    '/gang sair': '',
+    '/gang kickar': 'Digite: /gang kickar [id do player]',
+    '/gang level': 'Digite: /gang level [id do player]',
+    '/gang lider': 'Digite: /gang lider [id do player]',
+    '/gang info': '',
+    '/gang membros': '',
+    '/pm': 'Digite: /pm [id do player] [mensagem]'
+};*/
+
 if(mp.storage.data.timeStamp === undefined)
     mp.storage.data.timeStamp = false;
 if(mp.storage.data.pageSize === undefined)
@@ -9,17 +22,15 @@ if(mp.storage.data.toggleChat === undefined)
 
 mp.gui.chat.show(false);
 
-const chat = mp.browsers.new('package://player/advanced-chat/index.html');
-chat.markAsChat();
+const chat = mp.browsers.new('package://cef/advanced-chat/index.html');
 
-console.log(chat);
+chat.markAsChat();
 
 // Set Data
 chat.execute(`setToggleTimestamp(${mp.storage.data.timeStamp});`);
 chat.execute(`setPageSize(${mp.storage.data.pageSize});`);
 chat.execute(`setFontSize(${mp.storage.data.fontSize});`);
 chat.execute(`setToggleChat(${mp.storage.data.toggleChat});`);
-
 
 // Add commands
 mp.events.add("client:timestamp", () => {
@@ -29,8 +40,7 @@ mp.events.add("client:timestamp", () => {
 });
 
 mp.events.add("client:fontsize", (fontSize) => {
-    if(fontSize< 0.5 || fontSize > 1.5)
-    {
+    if(fontSize< 0.5 || fontSize > 1.5) {
         mp.gui.chat.push("/fontsize accepts values between 0.5 and 1.5 (Default: 0.9)");
         return;
     }
@@ -39,8 +49,7 @@ mp.events.add("client:fontsize", (fontSize) => {
 });
 
 mp.events.add("client:pagesize", (pageSize) => {
-    if(pageSize< 4 || pageSize > 24)
-    {
+    if(pageSize < 4 || pageSize > 24) {
         mp.gui.chat.push("/pagesize accepts values between 4 and 24 (Default: 18)");
         return;
     }

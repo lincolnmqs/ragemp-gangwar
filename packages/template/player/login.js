@@ -3,7 +3,6 @@ const { v4: uuidv4 } = require('uuid');
 const moment = require('moment');
 
 const saltRounds = 10;
-const player = {};
 
 //  Called when a player submits the Registration HTML form
 mp.events.add('server:registerAccount', async (player, username, email, password) => {
@@ -44,7 +43,28 @@ mp.events.add('server:loginAccount', async (player, username, password) => {
 mp.events.add('server:loadAccount', async (player, username) => {
     try {
         const [rows] = await mp.db.query(`
-            SELECT * 
+            SELECT
+                \`users\`.\`userId\` AS \`playerId\`, 
+                \`users\`.\`username\` AS \`playerName\`,
+                \`users\`.\`money\` AS \`money\`,
+                \`users\`.\`cash\` AS \`cash\`,
+                \`users\`.\`levelAdmin\` AS \`levelAdmin\`,
+                \`users\`.\`levelVip\` AS \`levelVip\`,
+                \`users\`.\`levelPlayer\` AS \`levelPlayer\`,
+                \`users\`.\`expPlayer\` AS \`expPlayer\`,
+                \`users\`.\`kills\` AS \`kills\`,
+                \`users\`.\`deaths\` AS \`deaths\`,
+                \`users\`.\`position\` AS \`position\`,
+                \`users\`.\`onlineTime\` AS \`onlineTime\`,
+                \`users\`.\`lastActive\` AS \`lastActive\`,
+                \`users\`.\`createdAt\` AS \`createdAt\`,
+
+                \`gangs\`.\`gangId\` AS \`gangId\`,
+                \`gangs\`.\`name\` AS \`gangName\`,
+                \`gangs\`.\`tag\` AS \`gangTag\`,
+                \`gangs\`.\`levelGang\` AS \`levelGang\`,
+                \`gangs\`.\`expGang\` AS \`expGang\`,
+                \`gangs\`. \`color\` AS \`color\`
             FROM \`users\` 
             INNER JOIN \`gangs\`
             ON \`users\`.\`gangId\` = \`gangs\`.\`gangId\`
@@ -56,21 +76,45 @@ mp.events.add('server:loadAccount', async (player, username) => {
         `, [username, username]);
         
         if(rows.length != 0){
-            player.sqlID = rows[0][0].ID;
+            const user = rows[0][0];
+
+            player.sqlID = user.ID;
             player.name = username;
             player.setVariable('username', username);
             //  If a position doesn't exist in the database, load them onto the default spawn position
-            rows[0][0].position === null
+            user.position === null
                 ? player.position = new mp.Vector3(mp.settings.defaultSpawnPosition)
-                : player.position = new mp.Vector3(JSON.parse(rows[0][0].position));
+                : player.position = new mp.Vector3(JSON.parse(user.position));
 
-            const onlineTime = rows[0][0].onlineTime;
+            const onlineTime = user.onlineTime;
 
             player[username] = {
+                playerId        : user.playerId,
+                playerName      : user.playerName,
+                levelAdmin      : user.levelAdmin,
+                levelVip        : user.levelVip,
+                levelGang       : user.levelGang,
+                levelPlayer     : user.levelPlayer,
+                expPlayer       : user.expPlayer,
+                money           : user.money,
+                cash            : user.cash,
+                kills           : user.kills,
+                deaths          : user.deaths,
+                lastActive      : user.lastActive,
+                position        : user.position,
                 onlineTime      : onlineTime,
                 onlineTimeStart : Date.now(),
-                color           : rows[0][0].color
+                color           : user.color,
+                gangInfo : {
+                    gangId    : user.gangId,
+                    gangName  : user.gangName,
+                    gangTag   : user.gangTag,
+                    levelGang : user.levelGang,
+                    expGang   : user.expGang
+                }
             };
+
+            player.call('client:infoPlayer', [player[username]]);
 
             player.setVariable("loggedIn", true);
         }
@@ -86,7 +130,7 @@ mp.events.add('playerJoin', (player) => {
 mp.events.add('playerQuit', async (player) => {
     if(player.getVariable('loggedIn') === false) return;
 
-    const onlineTimeOld = player[player.name].onlineTime;
+    const onlineTimeOld = player.onlineTime;
     const onlineTimeCurrent = onlineTimeDiff(player);
 
     const onlineTime = onlineTimeOld + onlineTimeCurrent;
@@ -99,6 +143,8 @@ mp.events.add('playerQuit', async (player) => {
 
             showOnlineTime(onlineTime);
         }
+        // delete local data
+        delete player[name];
         console.log(`${name} has quit the server.`);
     } catch(e) { errorHandler(e) }
 })

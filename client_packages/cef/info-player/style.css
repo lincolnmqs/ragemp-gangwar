@@ -1,0 +1,83 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.hud {
+    position: fixed;
+    bottom: 20%;
+    right: 5%;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    width: 200px;
+    font-size: 14px;
+    text-align: center;
+    text-shadow: rgba(0, 0, 0, 1) 0 2px 4px, rgba(0, 0, 0, 1) 0 0 2px;
+}
+.hud div {
+    margin-bottom: 5px; /* Espaço entre linhas */
+}
+.hud div:last-child {
+    margin-bottom: 0; /* Remove o espaço do último item */
+}
+#playerNation {
+    color: #FFA500;
+}
+#playerName, #gangName {
+    color: #6B3FA0;
+}
+
+#expPlayerBar {
+    width: 170px;
+    height: 15px;
+    padding: 0;
+    text-align: center;
+    border-style: solid;
+    border-width: 0.3%;
+    border-color: black;
+    background-color: #0a0a0a;
+    margin-bottom: 5%;
+    position: relative;
+}
+#expGangBar {
+    width: 170px;
+    height: 15px;
+    padding:0px;
+    text-align: center;
+    border-style: solid;
+    border-width: 0.3%;
+    border-color: black;
+    background-color:#0a0a0a;
+    margin-bottom: 5%;
+    position: relative;
+}
+
+#expPlayerBar::after, #expGangBar::after {
+    content: "EXP";
+    position: absolute;
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 10px;
+    text-decoration: none;
+    text-shadow: rgba(0, 0, 0, 1) 0 2px 4px, rgba(0, 0, 0, 1) 0 0 2px;
+    pointer-events: none;
+    z-index: 2; 
+}
+
+#boxExpPlayer, #boxExpGang {
+    position: absolute;
+    background: #00ff40;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+#boxExpGang {
+    background: #0059ff;
+}
+bod {
+    overflow:hidden;
+}

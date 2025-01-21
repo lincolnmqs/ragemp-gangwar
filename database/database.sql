@@ -268,5 +268,10 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 INSERT INTO `db_ragemp`.`gangs` 
   SET `uuid` = '09c88890-7736-4857-b42a-5b9741f65df8', `name` = 'Player', `tag` = 'Play', `description` = 'Player', `money` = 0, `color` = '3d3d3d';
 
+INSERT INTO `db_ragemp`.`gangs` 
+  SET `uuid` = '335ceb56-2f21-49d5-9ef3-d87815d8116a', `name` = 'ScorpionS', `tag` = 'SCS', `description` = 'Mais que um clan, uma família!', `money` = 0, `color` = 'FF0000';
+
 ALTER TABLE `db_ragemp`.`users` 
 ADD COLUMN `levelVip` INT NOT NULL DEFAULT 0;
+
+UPDATE `users` SET `gangId` = 2 WHERE username = 'black'

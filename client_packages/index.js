@@ -1,6 +1,6 @@
-require('./player/login.js');
-require('./player/chat.js');
-require('./player/advanced-chat');
+require('./player/login');
+require('./player/chat');
+require('./player/info');
 
 mp.events.add('playerReady', () => {
     mp.events.call('client:showLoginScreen');

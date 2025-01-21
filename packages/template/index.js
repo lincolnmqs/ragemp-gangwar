@@ -28,5 +28,5 @@ const database = require('./database.js');
     }
 })();
 
-require('./player/authentication.js');
+require('./player/login.js');
 require('./player/chat.js');
